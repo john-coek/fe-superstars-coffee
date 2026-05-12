@@ -21,6 +21,12 @@ const menuItems = ref([
         label: "General",
         items: [{ icon: "pi pi-th-large", to: "/", label: "Dashboard" }],
     },
+    {
+        label: "Management",
+        items: [
+            { icon: "pi pi-tag", to: "/product-categories", label: "Product Categories" }
+        ]
+    }
 ]);
 </script>
 <template>
@@ -80,7 +86,7 @@ const menuItems = ref([
                     <i class="pi pi-user text-lg text-surface-600"></i>
                 </div>
                 <div class="text-left">
-                  <div class="text-sn font-semibold text-surface-900">
+                  <div class="text-sm font-semibold text-surface-900">
                     {{ user?.name }}
                   </div>
                   <div class="text-sm text-surface-500">

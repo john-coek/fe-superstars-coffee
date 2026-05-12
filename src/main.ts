@@ -9,6 +9,8 @@ import './assets/main.css'
 import App from "./App.vue";
 import router from "./router";
 
+import { ConfirmationService, ToastService } from 'primevue';
+
 const app = createApp(App);
 
 app.use(createPinia());
@@ -58,5 +60,8 @@ app.use(PrimeVue, {
     }
   },
 });
+
+app.use(ConfirmationService)
+app.use(ToastService)
 
 app.mount("#app");
