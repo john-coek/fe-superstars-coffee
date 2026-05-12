@@ -34,30 +34,27 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach(async (to, _from, next) => {
-  const auth = useAuthStore();
+router.beforeEach(async (to, from, next)=> {
+  const auth = useAuthStore()
 
-  // 1. Jika punya token tapi data user belum ada (misal: refresh halaman)
-  if (auth.isAuthenticated && !auth.user) {
+  if(auth.isAuthenticated && !auth.user){
     try {
-      await auth.fetchUser();
-    } catch (error) {
-      auth.logout(); // Hapus token/state yang tidak valid
-      return next({ name: 'login' });
+      await auth.fetchUser()
+    } catch{
+      auth.logout()
+      return next('/login')
     }
   }
 
-  // 2. Proteksi Halaman: Butuh Login
-  if (to.matched.some(record => record.meta.requiresAuth) && !auth.isAuthenticated) {
-    return next({ name: 'login' });
+  if(to.meta.requiresAuth && !auth.isAuthenticated){
+    return next('/login')
   }
 
-  // 3. Proteksi Halaman: Hanya untuk Guest (Login/Register)
-  if (to.matched.some(record => record.meta.guest) && auth.isAuthenticated) {
-    return next({ name: 'dashboard' });
+  if(to.meta.guest && auth.isAuthenticated){
+    return next('/')
   }
 
-  next();
-});
+  next()
+})
 
-export default router;
+export default router
