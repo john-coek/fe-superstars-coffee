@@ -68,8 +68,9 @@ onMounted(() => {
         <p class="text-surface-600 text-sm">The list below shows all product categories</p>
       </div>
 
-      <Button asChild>
-        <RouterLink to="/add" class="p-button p-component"> Add Category </RouterLink>
+      <Button asChild v-slot="slotProps">
+        <RouterLink :to="{ name: 'product-categories-create'}" :class="slotProps.class"> 
+          Add Category</RouterLink>
       </Button>
     </div>
 
