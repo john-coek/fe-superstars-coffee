@@ -97,6 +97,15 @@ onMounted(() => {
         <Column header="Actions" style="width: 5rem">
           <template #body="{ data }">
             <div class="flex items-center gap-2">
+              <RouterLink :to="{name: 'product-categories-edit', params: { id: data.id } }">
+                <Button 
+                icon="pi pi-pencil" 
+                text 
+                rounded 
+                severity="primary" 
+                @click="confirmDelete(data.id)" 
+              />
+              </RouterLink>
               <Button 
                 icon="pi pi-trash" 
                 text 
@@ -104,6 +113,7 @@ onMounted(() => {
                 severity="danger" 
                 @click="confirmDelete(data.id)" 
               />
+              
             </div>
           </template>
         </Column>

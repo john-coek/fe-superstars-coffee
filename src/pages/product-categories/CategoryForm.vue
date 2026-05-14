@@ -1,20 +1,69 @@
 <script setup lang="ts">
-import { event } from '@primeuix/themes/aura/timeline';
-import { Button, FileUpload, InputText, Textarea } from 'primevue';
-import { computed, ref } from 'vue';
+import { createCategory, getCategory, updateCategory, uploadCategoryImage } from '@/api/product-categories.api';
+import router from '@/router';
+import { Button, FileUpload, InputText, Message, Textarea, useToast } from 'primevue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute()
+const toast = useToast()
+
+const loading = ref(false)
+const errors = ref<Record<string, string[]>>({})
+
+const form = ref({
+  id: 0,
+  name: "",
+  description: ""
+})
 
 const isEdit = computed(() => !!categoryId.value)
 
 const selectedFile = ref<File | null>(null)
 const imagePreview = ref<string | null>(null)
 
-const form = ref({
-  name: "",
-  descriptions: ""
-})
+const submit = async () => {
+  loading.value = true
+
+  try {
+    if (isEdit.value) {
+      await updateCategory(form.value.id, form.value)
+    } else {
+      const res = await createCategory(form.value)
+
+      form.value.id = res.data.data.id
+    }
+
+    if (selectedFile.value) {
+      const fd = new FormData
+      fd.append("image", selectedFile.value)
+      await uploadCategoryImage(form.value.id, fd)
+    }
+
+    toast.add({
+      severity: "success",
+      summary: "Success",
+      detail: isEdit.value ? "Category updated succesfully" : "Category created successfully",
+      life: 3000,
+    })
+
+    router.push("/product-categories")
+  } catch (error: any) {
+    if (error.response?.status === 422) {
+      errors.value = error.response?.data.errors ?? {}
+      return
+    }
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: error.response?.data?.message,
+      life: 3000
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
 
 const onFileSelect = (event: { files: File[] }) => {
   const file = event.files[0]
@@ -29,6 +78,30 @@ const categoryId = computed<number | null>(() =>
   route.params.id ? Number(route.params.id) : null
 )
 
+onMounted(async () => {
+  if (!isEdit.value) return
+
+  loading.value = true
+
+  try {
+    const res = await getCategory(categoryId.value!)
+    const data = res.data.data
+
+    form.value.id = data.id
+    form.value.name = data.name
+    form.value.description = data.description ?? ""
+    imagePreview.value = data.image ?? ""
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Failed to load category",
+      life: 3000
+    })
+  } finally {
+    loading.value = false
+  }
+})
 
 </script>
 
@@ -60,7 +133,7 @@ const categoryId = computed<number | null>(() =>
     </div>
 
     <div class="bg-white rounded-2xl border border-surface-200 overflow-hidden mx-4">
-      <form>
+      <form @submit.prevent="submit">
         <div class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
 
           <!-- IMAGE -->
@@ -98,15 +171,24 @@ const categoryId = computed<number | null>(() =>
               </label>
 
               <InputText id="name" v-model="form.name" type="text" placeholder="Signature Coffee..." fluid
-                class="bg-surface-50! focus:bg-white! border-surface-200" />
+                class="bg-surface-50! focus:bg-white! border-surface-200" :invalid="!!errors.name" />
+              <Message v-if="errors.name" severity="error" size="small" variant="simple">
+                {{ errors.name[0] }}
+              </Message>
             </div>
             <div class="flex flex-col gap-2">
               <label for="name" class="font-medium text-surface-900">
                 Description <span class="text-red-600">*</span>
               </label>
 
-              <Textarea id="name" v-model="form.descriptions" type="text" placeholder="Signature Coffee..." fluid
+              <Textarea id="description" v-model="form.description" type="text" placeholder="Your text" fluid
                 class="bg-surface-50! focus:bg-white! border-surface-200" rows="6" />
+            </div>
+            <div class="flex justify-end pt-4 mt-auto border-t border-surface-100">
+              <div class="flex gap-3">
+                <Button label="Cancel" severity="secondary" text @click="router.back()"></Button>
+                <Button type="submit" label="Save Category"></Button>
+              </div>
             </div>
           </div>
 
