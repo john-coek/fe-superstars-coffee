@@ -26,11 +26,11 @@ export const updateProduct = (
   }) => api.put(`/products/${id}`, payload)
 
 export const uploadProductImage = (id: number, formData: FormData) =>
-  api.post(`/products/${id}/image`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+    api.post(`/products/${id}/image`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
 
 export const deleteProduct = (id: number) =>
   api.delete(`/products/${id}`);

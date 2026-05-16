@@ -3,6 +3,8 @@ import Login from '@/pages/auth/Login.vue';
 import Dashboard from '@/pages/Dashboard.vue';
 import CategoryForm from '@/pages/product-categories/CategoryForm.vue';
 import CategoryList from '@/pages/product-categories/CategoryList.vue';
+import CustomerForm from '@/pages/customers/CustomerForm.vue';
+import CustomerList from '@/pages/customers/CustomerList.vue';
 import ProductForm from '@/pages/products/ProductForm.vue';
 import ProductList from '@/pages/products/ProductList.vue';
 import { useAuthStore } from '@/stores/auth.store';
@@ -56,6 +58,21 @@ const router = createRouter({
           path: 'products/:id/edit',
           name: 'products-edit',
           component: ProductForm
+        },
+        {
+          path: 'customers',
+          name: 'customers',
+          component: CustomerList
+        },
+        {
+          path: 'customers/create',
+          name: 'customers-create',
+          component: CustomerForm
+        },
+        {
+          path: 'customers/:id/edit',
+          name: 'customers-edit',
+          component: CustomerForm
         }
       ]
     },
